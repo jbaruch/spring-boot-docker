@@ -1,0 +1,49 @@
+#!/usr/bin/env groovy
+
+node ('master') {
+    git url: 'https://github.com/jbaruch/spring-boot-docker.git'
+    def rtServer = Artifactory.newServer url: "http://jfrog.local/artifactory", credentialsId: CREDENTIALS
+    def buildInfo = Artifactory.newBuildInfo()
+    def dockerReg="jfrog.local:5001"
+    def tagDockerApp
+    def rtDocker
+    buildInfo.env.capture = true
+    stage('maven build') {
+      dir ('examples-java') {
+        sh 'mvn install'
+      }
+    }
+    stage('build helloworld-service docker') {
+      dir ('examples-java/helloworld-service') {
+        tagDockerApp = dockerReg+"/jbaruch/helloworld-service:${env.BUILD_NUMBER}"
+        docker.build(tagDockerApp)
+        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+              rtDocker = Artifactory.docker("${env.USERNAME}", "${env.PASSWORD}")
+              rtDocker.push(tagDockerApp, 'docker-stage-local', buildInfo)
+        }        
+      }
+    }
+    stage('build guestbook-service docker') {
+      dir ('examples-java/guestbook-service') {
+        tagDockerApp = dockerReg + "/jbaruch/helloworld-service:${env.BUILD_NUMBER}"
+        docker.build(tagDockerApp)
+        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+              rtDocker = Artifactory.docker("${env.USERNAME}", "${env.PASSWORD}")
+              rtDocker.push(tagDockerApp, 'docker-stage-local', buildInfo)
+        }        
+      }
+    }
+    stage('build helloworld-ui docker') {
+      dir ('examples-java/guestbook-service') {
+        tagDockerApp = dockerReg + "/jbaruch/helloworld-service:${env.BUILD_NUMBER}"
+        docker.build(tagDockerApp)
+        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+              rtDocker = Artifactory.docker("${env.USERNAME}", "${env.PASSWORD}")
+              rtDocker.push(tagDockerApp, 'docker-stage-local', buildInfo)
+        }        
+      }
+    }
+    stage('push BuildInfo') {
+      rtServer.publishBuildInfo buildInfo
+    }	   
+}
