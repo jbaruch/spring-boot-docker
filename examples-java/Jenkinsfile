@@ -5,13 +5,14 @@ node ('master') {
     def buildInfo
     def dockerReg="jfrog.local:5001"
     def dockerNamespace='jbaruch'
-    def dockerFinalTag="${env.BUILD_NUMBER}"
+    def dockerFinalTag
     def tagDockerApp
     def rtDocker
     stage('initializing') {
       rtServer = Artifactory.newServer url: "http://jfrog.local/artifactory", credentialsId: CREDENTIALS
       rtDocker = Artifactory.docker credentialsId: CREDENTIALS
       git url: 'https://github.com/jbaruch/spring-boot-docker.git'
+      dockerFinalTag="${env.BUILD_NUMBER}"
     }
     buildInfo.env.capture = true
     stage('maven build') {
