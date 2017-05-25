@@ -20,7 +20,7 @@ node ('master') {
         rtMaven.tool = 'mvn'
         rtMaven.resolver server: rtServer, releaseRepo: 'libs-release', snapshotRepo: 'libs-snapshot'
         rtMaven.deployer server: rtServer, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
-        buildInfo = rtMaven.run pom: './pom.xml', goals: 'clean install'
+        buildInfo = rtMaven.run pom: './pom.xml', goals: 'clean install -DskipTests'
         buildInfo.env.capture = true
       }
     }
