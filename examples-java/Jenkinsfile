@@ -14,13 +14,13 @@ node ('master') {
       git url: 'https://github.com/jbaruch/spring-boot-docker.git'
       dockerFinalTag="${env.BUILD_NUMBER}"
     }
-    buildInfo.env.capture = true
     stage('maven build') {
       dir ('examples-java') {
         def rtMaven = Artifactory.newMavenBuild()
         rtMaven.resolver server: rtServer, releaseRepo: 'libs-release', snapshotRepo: 'libs-snapshot'
         rtMaven.deployer server: rtServer, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
         buildInfo = rtMaven.run pom: './pom.xml', goals: 'clean install'
+        buildInfo.env.capture = true
       }
     }
     stage('build helloworld-service docker') {
