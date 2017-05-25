@@ -17,7 +17,7 @@ node ('master') {
     stage('maven build') {
       dir ('examples-java') {
         def rtMaven = Artifactory.newMavenBuild()
-        rtMaven.tool = MAVEN_TOOL
+        rtMaven.tool = 'mvn'
         rtMaven.resolver server: rtServer, releaseRepo: 'libs-release', snapshotRepo: 'libs-snapshot'
         rtMaven.deployer server: rtServer, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
         buildInfo = rtMaven.run pom: './pom.xml', goals: 'clean install'
