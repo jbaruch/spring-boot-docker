@@ -10,9 +10,7 @@ node ('master') {
     def rtDocker
     stage('initializing') {
       rtServer = Artifactory.newServer url: "http://jfrog.local/artifactory", credentialsId: CREDENTIALS
-      withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-        rtDocker = Artifactory.docker("${env.USERNAME}", "${env.PASSWORD}")
-      }
+      def rtDocker = Artifactory.docker credentialsId: CREDENTIALS
       git url: 'https://github.com/jbaruch/spring-boot-docker.git'
     }
     buildInfo.env.capture = true
@@ -35,20 +33,14 @@ node ('master') {
       dir ('examples-java/guestbook-service') {
         tagDockerApp = dockerReg+'/'+dockerNamespace+'/'+"guestbook-service"+':'+dockerFinalTag
         docker.build(tagDockerApp)
-        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-              rtDocker = Artifactory.docker("${env.USERNAME}", "${env.PASSWORD}")
-              rtDocker.push(tagDockerApp, 'docker-stage-local', buildInfo)
-        }        
+        rtDocker.push(tagDockerApp, 'docker-stage-local', buildInfo)
       }
     }
     stage('build helloworld-ui docker') {
       dir ('examples-java/helloworld-ui') {
         tagDockerApp = dockerReg+'/'+dockerNamespace+'/'+"helloworld-ui"+':'+dockerFinalTag
         docker.build(tagDockerApp)
-        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-              rtDocker = Artifactory.docker("${env.USERNAME}", "${env.PASSWORD}")
-              rtDocker.push(tagDockerApp, 'docker-stage-local', buildInfo)
-        }        
+        rtDocker.push(tagDockerApp, 'docker-stage-local', buildInfo)
       }
     }
     stage('push BuildInfo') {
