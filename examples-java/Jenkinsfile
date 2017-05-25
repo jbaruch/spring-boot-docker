@@ -10,7 +10,7 @@ node ('master') {
     buildInfo.env.capture = true
     stage('maven build') {
       dir ('examples-java') {
-        sh 'mvn install'
+        sh 'mvn install -DskipTests'
       }
     }
     stage('build helloworld-service docker') {
