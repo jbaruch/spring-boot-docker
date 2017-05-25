@@ -1,31 +1,34 @@
 #!/usr/bin/env groovy
 
 node ('master') {
-    git url: 'https://github.com/jbaruch/spring-boot-docker.git'
-    def rtServer = Artifactory.newServer url: "http://jfrog.local/artifactory", credentialsId: CREDENTIALS
-    def buildInfo = Artifactory.newBuildInfo()
+    def rtServer
+    def buildInfo
     def dockerReg="jfrog.local:5001"
     def dockerNamespace='jbaruch'
     def dockerFinalTag="${env.BUILD_NUMBER}"
     def tagDockerApp
     def rtDocker
+    stage('initializing') {
+      rtServer = Artifactory.newServer url: "http://jfrog.local/artifactory", credentialsId: CREDENTIALS
+      withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+        rtDocker = Artifactory.docker("${env.USERNAME}", "${env.PASSWORD}")
+      }
+      git url: 'https://github.com/jbaruch/spring-boot-docker.git'
+    }
     buildInfo.env.capture = true
     stage('maven build') {
       dir ('examples-java') {
         def rtMaven = Artifactory.newMavenBuild()
         rtMaven.resolver server: rtServer, releaseRepo: 'libs-release', snapshotRepo: 'libs-snapshot'
         rtMaven.deployer server: rtServer, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
-        def buildInfo = rtMaven.run pom: './pom.xml', goals: 'clean install'
+        buildInfo = rtMaven.run pom: './pom.xml', goals: 'clean install'
       }
     }
     stage('build helloworld-service docker') {
       dir ('examples-java/helloworld-service') {
         tagDockerApp = dockerReg+'/'+dockerNamespace+'/'+"helloworld-service"+':'+dockerFinalTag
         docker.build(tagDockerApp)
-        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-              rtDocker = Artifactory.docker("${env.USERNAME}", "${env.PASSWORD}")
-              rtDocker.push(tagDockerApp, 'docker-stage-local', buildInfo)
-        }        
+        rtDocker.push(tagDockerApp, 'docker-stage-local', buildInfo)
       }
     }
     stage('build guestbook-service docker') {
