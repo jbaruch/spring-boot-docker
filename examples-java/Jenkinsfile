@@ -36,7 +36,7 @@ node ('master') {
       }
     }
     stage('build helloworld-ui docker') {
-      dir ('examples-java/helloworld-ui-service') {
+      dir ('examples-java/helloworld-ui') {
         tagDockerApp = dockerReg+'/'+dockerNamespace+'/'+"helloworld-ui"+':'+dockerFinalTag
         docker.build(tagDockerApp)
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
