@@ -5,6 +5,8 @@ node ('master') {
     def rtServer = Artifactory.newServer url: "http://jfrog.local/artifactory", credentialsId: CREDENTIALS
     def buildInfo = Artifactory.newBuildInfo()
     def dockerReg="jfrog.local:5001"
+    def dockerNamespace='jbaruch'
+    def dockerFinalTag="${env.BUILD_NUMBER}"
     def tagDockerApp
     def rtDocker
     buildInfo.env.capture = true
@@ -15,7 +17,7 @@ node ('master') {
     }
     stage('build helloworld-service docker') {
       dir ('examples-java/helloworld-service') {
-        tagDockerApp = dockerReg+"/jbaruch/helloworld-service:${env.BUILD_NUMBER}"
+        tagDockerApp = dockerReg+'/'+dockerNamespace+'/'+"helloworld-service"+':'+dockerFinalTag
         docker.build(tagDockerApp)
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
               rtDocker = Artifactory.docker("${env.USERNAME}", "${env.PASSWORD}")
@@ -25,7 +27,7 @@ node ('master') {
     }
     stage('build guestbook-service docker') {
       dir ('examples-java/guestbook-service') {
-        tagDockerApp = dockerReg + "/jbaruch/helloworld-service:${env.BUILD_NUMBER}"
+        tagDockerApp = dockerReg+'/'+dockerNamespace+'/'+"guestbook-service"+':'+dockerFinalTag
         docker.build(tagDockerApp)
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
               rtDocker = Artifactory.docker("${env.USERNAME}", "${env.PASSWORD}")
@@ -34,8 +36,8 @@ node ('master') {
       }
     }
     stage('build helloworld-ui docker') {
-      dir ('examples-java/guestbook-service') {
-        tagDockerApp = dockerReg + "/jbaruch/helloworld-service:${env.BUILD_NUMBER}"
+      dir ('examples-java/helloworld-ui-service') {
+        tagDockerApp = dockerReg+'/'+dockerNamespace+'/'+"helloworld-ui"+':'+dockerFinalTag
         docker.build(tagDockerApp)
         withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
               rtDocker = Artifactory.docker("${env.USERNAME}", "${env.PASSWORD}")
