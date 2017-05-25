@@ -1,4 +1,5 @@
 FROM jfrog.local:5001/openjdk:8
+MAINTAINER Baruch Sadogursky jbaruch@jfrog.com
 
 RUN mkdir /opt/cdbg
 RUN wget -qO- https://storage.googleapis.com/cloud-debugger/compute-java/debian-wheezy/cdbg_java_agent_gce.tar.gz | tar xvz -C /opt/cdbg
