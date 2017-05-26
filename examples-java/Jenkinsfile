@@ -34,7 +34,7 @@ node ('master') {
         tagDockerApp = dockerReg+'/'+dockerNamespace+'/'+imageName+':'+dockerFinalTag
         docker.build(tagDockerApp)
         rtDocker.push(tagDockerApp, REPO, buildInfo)
-        retagLatest(imageName)
+        retagLatest(dockerNamespace+'/'+imageName)
       }
     }
     stage('build guestbook-service docker') {
@@ -43,7 +43,7 @@ node ('master') {
         tagDockerApp = dockerReg+'/'+dockerNamespace+'/'+imageName+':'+dockerFinalTag
         docker.build(tagDockerApp)
         rtDocker.push(tagDockerApp, REPO, buildInfo)
-        retagLatest(imageName)
+        retagLatest(dockerNamespace+'/'+imageName)
       }
     }
     stage('build helloworld-ui docker') {
@@ -52,7 +52,7 @@ node ('master') {
         tagDockerApp = dockerReg+'/'+dockerNamespace+'/'+imageName+':'+dockerFinalTag
         docker.build(tagDockerApp)
         rtDocker.push(tagDockerApp, REPO, buildInfo)
-        retagLatest(imageName)
+        retagLatest(dockerNamespace+'/'+imageName)
       }
     }
     stage('push BuildInfo') {
