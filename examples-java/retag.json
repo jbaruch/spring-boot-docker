@@ -1,0 +1,8 @@
+
+{
+  "targetRepo" : "docker-dev-local",
+  "dockerRepository" : "#",
+  "tag" : "@",
+  "targetTag" : "latest",
+  "copy": true
+}

@@ -1,4 +1,4 @@
-FROM jfrog.local:5001/openjdk:8
+FROM jbaruch-docker.jfrog.io/openjdk:8
 MAINTAINER Baruch Sadogursky jbaruch@jfrog.com
 
 RUN mkdir /opt/cdbg
