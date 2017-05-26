@@ -17,17 +17,20 @@ node ('master') {
       dockerFinalTag="${env.BUILD_NUMBER}"
       dockerReg=ARTDOCKER_REGISTRY
       repoName=REPO
+      buildInfo = new Artifactory.newBuildInfo()
+      buildInfo.env.capture = true
     }
+
     stage('maven build') {
       dir ('examples-java') {
         def rtMaven = Artifactory.newMavenBuild()
         rtMaven.tool = MAVEN_TOOL
         rtMaven.resolver server: rtServer, releaseRepo: 'libs-release', snapshotRepo: 'libs-snapshot'
         rtMaven.deployer server: rtServer, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
-        buildInfo = rtMaven.run pom: './pom.xml', goals: 'clean install -DskipTests'
-        buildInfo.env.capture = true
+        rtMaven.run pom: './pom.xml', goals: 'clean install -DskipTests', buildInfo: buildInfo
       }
     }
+
     stage('build helloworld-service docker') {
       imageName='helloworld-service'
       dir ('examples-java/'+imageName) {
@@ -37,6 +40,7 @@ node ('master') {
         retagLatest(dockerNamespace+'/'+imageName, dockerFinalTag)
       }
     }
+
     stage('build guestbook-service docker') {
       imageName='guestbook-service'
       dir ('examples-java/'+imageName) {
@@ -46,6 +50,7 @@ node ('master') {
         retagLatest(dockerNamespace+'/'+imageName, dockerFinalTag)
       }
     }
+
     stage('build helloworld-ui docker') {
       imageName='helloworld-ui'
       dir ('examples-java/'+imageName) {
@@ -55,6 +60,7 @@ node ('master') {
         retagLatest(dockerNamespace+'/'+imageName, dockerFinalTag)
       }
     }
+
     stage('push BuildInfo') {
       rtServer.publishBuildInfo buildInfo
     }	   
