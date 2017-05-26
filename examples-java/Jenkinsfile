@@ -71,6 +71,8 @@ def retagLatest (imageName, tagStr) {
         println "Curl String is " + regTagStr
         sh regTagStr
         def fileLoc = imageName+'/latest/manifest.json'
-        def updatePropStr = cuurlString + 'api/storage/'+REPO+'/'+fileLoc+'properties=sourceTag='
+        def updatePropStr = curlString + 'api/storage/'+REPO+'/'+fileLoc+'properties=sourceTag='+tagStr
+        println "Curl String is " + regTagStr
+        sh updatePropStr
     }
 }
