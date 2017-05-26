@@ -17,7 +17,7 @@ node ('master') {
       dockerFinalTag="${env.BUILD_NUMBER}"
       dockerReg=ARTDOCKER_REGISTRY
       repoName=REPO
-      buildInfo = new Artifactory.newBuildInfo()
+      buildInfo = Artifactory.newBuildInfo()
       buildInfo.env.capture = true
     }
 
