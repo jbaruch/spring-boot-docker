@@ -86,7 +86,7 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>pl.project13.maven</plugin>
+				<groupId>pl.project13.maven</groupId>
 				<artifactId>git-commit-id-plugin</artifactId>
 			</plugin>
 		</plugins>
