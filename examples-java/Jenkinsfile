@@ -3,18 +3,20 @@
 node ('master') {
     def rtServer
     def buildInfo
-    def dockerReg="jfrog.local:5001"
+    def dockerReg
     def dockerNamespace='jbaruch'
     def dockerFinalTag
     def tagDockerApp
     def rtDocker
-    def repoName='docker-dev-local'
+    def repoName
     def imageName
     stage('initializing') {
       rtServer = Artifactory.newServer url: SERVER_URL, credentialsId: CREDENTIALS
       rtDocker = Artifactory.docker credentialsId: CREDENTIALS
       git url: 'https://github.com/jbaruch/spring-boot-docker.git'
       dockerFinalTag="${env.BUILD_NUMBER}"
+      dockerReg=ARTDOCKER_REGISTRY
+      repoName=REPO
     }
     stage('maven build') {
       dir ('examples-java') {
